@@ -9,6 +9,7 @@
 #define zac_max 9  //ザックの最大容量
 #define max 200
 #define ga_rank  10 //遺伝子の世代
+#define late_a 95
 
  int num_val[objc_max]={4,5,12,14};//オブジェクトの価値
  int num_obj[objc_max]={2,3,5,6};//オブジェクトの重量 //constだと色々めんどくさいため
@@ -102,7 +103,7 @@ int main(){
             {
                 if(num_gas[i].sum_v  > cnt1  ){
                     one =i;//一番上位の遺伝子番号を登録
-                    cnt1 = num_gas[i].sum_v;
+                    cnt1 = num_gas[i].sum_v;//最大価値を保存
                 }
             }
             
@@ -111,7 +112,7 @@ int main(){
                 if (num_gas[i].sum_v > cnt2 && i != one)//一番上位の遺伝子を除く
                 {
                     two=i;//二番目に上位の遺伝子を上書き
-                    cnt2=num_gas[i].sum_v; //値を
+                    cnt2=num_gas[i].sum_v; //二番目に大きい価値を保存
                 }
             }
 
@@ -133,16 +134,22 @@ int main(){
                 {
                     sum_vs+=num_gas[i].sum_v;//ルーレットに加算
                     if(sum_vs > arr){
-                         for (size_t j = 0; j < objc_max; i++)
-                         {
                             sub_ga = num_gas[i];//ルーレット選択用に代入
-                         }
-                
-                    }else{
-                        break;
+                            break;//ルーレット選択終了
                     }
                 }
             }
+
+            for (size_t i = 0; (objc_max%2 ==1 && i < objc_max-1)||(objc_max%2==0 &&i < objc_max-2) ; i++)//遺伝子交叉
+            {//個体個数が奇数子の時個体数-1で終了、偶数子の時個体数-2で終了    
+                arr = (int)((rand()/RAND_MAX)*100);//交叉確率算出
+                if(arr < late_a){
+                    
+                }
+
+            }
+            
+
             
             
             
