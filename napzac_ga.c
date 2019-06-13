@@ -71,11 +71,13 @@ int main(){
     //std ::vector<int> num_obj{2,3,5,6}; //商品の重量  
     //std ::vector <vector<bool>>(objc_max, gas(4,0));  //遺伝子
     int sums=0; //総価値の合計
+    int r1=0,r2=0;//二点交叉の交叉範囲
     int sum_vs=0;//ルーレット用加算値
     int arr=0;//ルーレット選択確率_整数
     //int num_ga [ga_mon][objc_max];//遺伝子の皆さん
     //int Eva_ans[objc_max];//評価値
     ga_s num_gas[ga_mon];//ナップザック構造体配列宣言
+    ga_s num_child[2]; //交叉遺伝子
     ga_s sub_ga;//次世代遺伝子のいでモノ
     int one=0,cnt1=-1;//上位一位遺伝子
     int two=0,cnt2=-1;//上位二位遺伝子
@@ -143,22 +145,14 @@ int main(){
             for (size_t i = 0; (objc_max%2 ==1 && i < objc_max-1)||(objc_max%2==0 &&i < objc_max-2) ; i++)//遺伝子交叉
             {//個体個数が奇数子の時個体数-1で終了、偶数子の時個体数-2で終了    
                 arr = (int)((rand()/RAND_MAX)*100);//交叉確率算出
-                if(arr < late_a){
                     
+                if(arr < late_a){
+                    r1 = (int)((rand()/RAND_MAX)*objc_max); //objc_maxは遺伝子長
+                    r2 = r1 + (int)((rand()/RAND_MAX)*objc_max);
+
+
                 }
-
             }
-            
-
-            
-            
-            
-            
-
-           
-            
-
-            
         }
 
     
