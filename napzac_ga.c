@@ -141,7 +141,7 @@ int main(){
                     }
                 }
             }
-
+           //todo オブジェクトの個数と遺伝子の数がごっちゃになっているので修正する
             for (size_t i = 0; (objc_max%2 ==1 && i < objc_max-1)||(objc_max%2==0 &&i < objc_max-2) ; i++)//遺伝子交叉
             {//個体個数が奇数子の時個体数-1で終了、偶数子の時個体数-2で終了    
                 arr = (int)((rand()/RAND_MAX)*100);//交叉確率算出
@@ -149,12 +149,43 @@ int main(){
                 if(arr < late_a){
                     r1 = (int)((rand()/RAND_MAX)*objc_max); //objc_maxは遺伝子長
                     r2 = r1 + (int)((rand()/RAND_MAX)*objc_max);
+                    
+                    for (int cout=0;cout < objc_max ; cout++){//二点交叉
+                        if(r1 <=cout && cout<=r2){
+                            num_child[0].gas[cout] = one_gas.gas[cout];
+                            num_child[1].gas[cout] = two_gas.gas[cout];   
+                        }else
+                        {
+                            num_child[0].gas[cout] = two_gas.gas[cout];
+                            num_child[1].gas[cout] = one_gas.gas[cout];  
+                        }
+                    }
 
-
+                    //エリートにchild遺伝子を戻す
+                    one_gas = num_child[0];
+                    two_gas = num_child[1];
                 }
             }
+
+            //突然変異
+
+            for (int obj = 0; obj < ga_mon; obj++)
+            {
+                arr = (int)((rand()/RAND_MAX)*100);
+                
+                if (arr > 3 ) //メモ　ここのハードコーディングは後で治すこと
+                {
+                    r1  = (int)(rand()/RAND_MAX)*objc_max;
+                    num_gas[obj].gas[r1] =  (num_gas[obj].gas[r1]+1)%2;//必要であれば遺伝子を入れ替えする
+                }
+            }
+            //エリート選択で使った遺伝子を元に戻す
+            num_gas[cnt1] = one_gas;
+            num_gas[cnt2] = two_gas;
+
         }
 
+    //ここにリザルトを出力する。
     
     
 
