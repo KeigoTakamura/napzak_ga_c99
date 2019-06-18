@@ -42,14 +42,14 @@ ga_s Eva(ga_s ga){//評価値算出
     ga.sum_c=0;
     ga.sum_v=0;
     for(int i=0; i  <  objc_max ; i++ ){
-        ga.sum_c +=  ga.gas[i] * num_val[i];  //ここで重量計算
+        ga.sum_c +=  ga.gas[i] * num_obj[i];  //ここで重量計算
     }
 
     if(ga.sum_c > zac_max){
         ga.sum_v = 0;//重さがオーバーしたらゼロ
     }else{
         for(int t=0;t < objc_max ; t++){
-            ga.sum_v  =  num_val[t] +ga.sum_v; //オーバーしてなかったら価値をそのまま適合度（評価値）として代入
+            ga.sum_v  =  num_val[t]*ga.gas[t] +ga.sum_v; //オーバーしてなかったら価値をそのまま適合度（評価値）として代入
         }
     }
 return  ga;   
