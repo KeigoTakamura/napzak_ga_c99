@@ -6,7 +6,7 @@
 
 #define objc_max 10  //オブジェクトの個数 アイテム数
 #define ga_mon 90 //個体数
-#define zac_max 450  //ザックの最大容量
+#define zac_max 50  //ザックの最大容量
 #define max 200
 #define ga_rank  1000//遺伝子の世代
 #define late_a 50  
@@ -112,7 +112,7 @@ int main(){
                 }
             }
             
-            logs[gen] = cnt1;
+            logs[gen] = num_gas[one].sum_v;
 
             for (int i = 0; i < ga_mon; i++)//上位二位の染色体を抽出
             {
@@ -156,13 +156,13 @@ int main(){
                     r2 = r1 + (int)((rand()/frand)*(objc_max-r1));
                     
                     for (int cout=0;cout < objc_max ; cout++){//二点交叉
-                        if(r1 <=cout && cout<=r2){
-                            num_child[0].gas[cout] = one_gas.gas[cout];
-                            num_child[1].gas[cout] = two_gas.gas[cout];   
+                        if(r1 >=cout && cout <= r2){
+                            num_child[0].gas[cout] = two_gas.gas[cout];
+                            num_child[1].gas[cout] = one_gas.gas[cout];   
                         }else
                         {
-                            num_child[0].gas[cout] = two_gas.gas[cout];
-                            num_child[1].gas[cout] = one_gas.gas[cout];  
+                            num_child[0].gas[cout] = one_gas.gas[cout];
+                            num_child[1].gas[cout] = two_gas.gas[cout];  
                         }
                     }
                     
@@ -204,7 +204,7 @@ int main(){
    
     FILE *fp;
     fp=fopen("test.txt","w+");
-    for(int j=0;j<ga_mon;j++){
+    for(int j=0;j<ga_rank;j++){
         fprintf(fp,"%d %d \n",j,logs[j]);
     }
     fclose(fp);
