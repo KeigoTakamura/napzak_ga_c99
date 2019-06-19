@@ -4,16 +4,16 @@
 #include<time.h>
 #include<stdio.h>
 
-#define objc_max 4  //オブジェクトの個数 アイテム数
-#define ga_mon 9 //個体数
-#define zac_max 12  //ザックの最大容量
+#define objc_max 10  //オブジェクトの個数 アイテム数
+#define ga_mon 90 //個体数
+#define zac_max 450  //ザックの最大容量
 #define max 200
-#define ga_rank  10 //遺伝子の世代
-#define late_a 95  
-#define random_late 3  //突然変異
+#define ga_rank  1000//遺伝子の世代
+#define late_a 50  
+#define random_late 15  //突然変異
 
-int num_val[objc_max]={4,5,12,14};//オブジェクトの価値
-int num_obj[objc_max]={2,3,5,6};//オブジェクトの重量 //constだと色々めんどくさいため
+int num_val[objc_max]={4,5,12,14,11,3,8,10,9,19};//オブジェクトの価値
+int num_obj[objc_max]={2,3,5,6,3,9,12,1,10,20};//オブジェクトの重量 //constだと色々めんどくさいため
 
 struct  ga_ss{ //評価要素構造体
     int sum_c;//合計重量
@@ -64,11 +64,13 @@ return  ga;
 */
 
 int main(){
+    int logs[ga_rank];
     //std ::vector<int> num_value{4,5,12,14};//商品の価値
     //std ::vector<int> num_obj{2,3,5,6}; //商品の重量  
     //std ::vector <vector<bool>>(objc_max, gas(4,0));  //遺伝子
     float frand =(float)RAND_MAX;//乱数範囲をfloatで指定
     int sums=0; //総価値の合計
+    int epw=0;//答えが収束したら強制終了させるための変数
     int r1=0,r2=0;//二点交叉の交叉範囲ne
     int sum_vs=0;//ルーレット用加算値
     int arr=0;//ルーレット選択確率_整数
@@ -77,8 +79,8 @@ int main(){
     ga_s num_gas[ga_mon];//ナップザック構造体配列宣言
     ga_s num_child[2]; //交叉遺伝子
     ga_s sub_ga;//次世代遺伝子のいでモノ　
-    int one=0,cnt1=-1;//上位一位遺伝子
-    int two=0,cnt2=-1;//上位二位遺伝子
+    int one=0,cnt1=0;//上位一位遺伝子
+    int two=0,cnt2=0;//上位二位遺伝子
     
     srand(time(NULL));
 
@@ -93,7 +95,10 @@ int main(){
         }
     }
     
+
+
     for(int gen=0; gen < ga_rank; gen++){ //世代の数だけ繰り返す
+            one=0,two=0;//エリート初期化
          //遺伝子評価フェーズ
             for(int Eva_count=0 ; Eva_count < ga_mon;Eva_count++){//遺伝子の数だけ繰り返したりする
                 num_gas[Eva_count]  = Eva(num_gas[Eva_count]);//評価関数　.sun_vに評価値を入れる。
@@ -107,6 +112,8 @@ int main(){
                 }
             }
             
+            logs[gen] = cnt1;
+
             for (int i = 0; i < ga_mon; i++)//上位二位の染色体を抽出
             {
                 if (num_gas[i].sum_v > cnt2 && i != one)//一番上位の遺伝子を除く
@@ -119,7 +126,7 @@ int main(){
             //エリート個体保存フェーズ
             one_gas = num_gas[one];//一番上位の個体を保存
             two_gas = num_gas[two];//二番目に上位の個体を保存
-
+            
             //ルーレット選択フェーズ
             //ob_sumが価値の合計値になる
 
@@ -144,8 +151,8 @@ int main(){
             {//個体個数が奇数子の時個体数-1で終了、偶数子の時個体数-2で終了    
                 arr = (int)((rand()/frand)*100);//交叉確率算出
                     
-                if(arr < late_a){
-                    r1 = (int)((rand()/frand)*objc_max); //objc_maxは遺伝子長
+                if(arr > late_a){
+                    r1 = (int)((rand()/frand)*(objc_max)); //objc_maxは遺伝子長
                     r2 = r1 + (int)((rand()/frand)*(objc_max-r1));
                     
                     for (int cout=0;cout < objc_max ; cout++){//二点交叉
@@ -158,8 +165,7 @@ int main(){
                             num_child[1].gas[cout] = one_gas.gas[cout];  
                         }
                     }
-
-                    //エリートにchild遺伝子を戻す
+                    
                     one_gas = num_child[0];
                     two_gas = num_child[1];
                 }
@@ -171,19 +177,41 @@ int main(){
             {
                 arr = (int)((rand()/frand)*100);
                 
-                if (arr > random_late ) 
+                if (arr > random_late) 
                 {
-                    r1  = (int)(rand()/frand)*objc_max;
+                    r1  = (int)(rand()/frand)*(objc_max-1);
                     num_gas[obj].gas[r1] =  (num_gas[obj].gas[r1]+1)%2;//必要であれば遺伝子を入れ替えする
-                }
+                 }
             }
             //エリート選択で使った遺伝子を元に戻す
             num_gas[one] = one_gas;
             num_gas[two] = two_gas;
         }
+    
+    for (size_t i = 0; i < ga_mon; i++)
+    {
+         num_gas[i]=Eva(num_gas[i]);
+    }
+    
+    cnt1=0;
+    for (int i = 0; i < ga_mon; i++) //上位1位の染色体を抽出
+     {
+                if(num_gas[i].sum_v  > cnt1  ){
+                    one =i;//一番上位の遺伝子番号を登録
+                    cnt1 = num_gas[i].sum_v;//最大価値を保存
+                }
+    }
+   
+    FILE *fp;
+    fp=fopen("test.txt","w+");
+    for(int j=0;j<ga_mon;j++){
+        fprintf(fp,"%d %d \n",j,logs[j]);
+    }
+    fclose(fp);
+    
 
-    printf("output result %d \n",num_gas[one].sum_v);        
-    printf("cnt %d \n",two);
+    printf("output result %d %d\n",num_gas[one].sum_v,num_gas[one].sum_c);        
+    printf("cnt %d \n",one);
     //ここにリザルトを出力する。
     return 0;
 }
