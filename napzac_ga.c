@@ -4,16 +4,15 @@
 #include<time.h>
 #include<stdio.h>
 
-#define objc_max 10  //オブジェクトの個数 アイテム数
-#define ga_mon 90 //個体数
-#define zac_max 50  //ザックの最大容量
-#define max 200
-#define ga_rank  1000//遺伝子の世代
-#define late_a 50  
-#define random_late 15  //突然変異
+#define objc_max 20  //オブジェクトの個数 アイテム数
+#define ga_mon 1000 //個体8数
+#define zac_max 89  //ザックの最大容量
+#define ga_rank  2000//遺伝子の世代
+#define late_a 10 //交叉発生  
+#define random_late 20//突然変異
 
-int num_val[objc_max]={4,5,12,14,11,3,8,10,9,19};//オブジェクトの価値
-int num_obj[objc_max]={2,3,5,6,3,9,12,1,10,20};//オブジェクトの重量 //constだと色々めんどくさいため
+int num_val[objc_max]={2,9,1,3,1,3,4,6,5,4,6,8,7,8,8,6,5,5,6,4};//オブジェクトの価値
+int num_obj[objc_max]={6,2,4,9,1,8,4,3,6,8,1,8,5,5,9,4,4,7,5,3};//オブジェクトの重量 //constだと色々めんどくさいため
 
 struct  ga_ss{ //評価要素構造体
     int sum_c;//合計重量
@@ -68,6 +67,7 @@ int main(){
     //std ::vector<int> num_value{4,5,12,14};//商品の価値
     //std ::vector<int> num_obj{2,3,5,6}; //商品の重量  
     //std ::vector <vector<bool>>(objc_max, gas(4,0));  //遺伝子
+    int sub_ga_nums=0;
     float frand =(float)RAND_MAX;//乱数範囲をfloatで指定
     int sums=0; //総価値の合計
     int epw=0;//答えが収束したら強制終了させるための変数
@@ -98,7 +98,7 @@ int main(){
 
 
     for(int gen=0; gen < ga_rank; gen++){ //世代の数だけ繰り返す
-            one=0,two=0;//エリート初期化
+            one=0,two=0,cnt1=0,cnt2=0;//エリート初期化
          //遺伝子評価フェーズ
             for(int Eva_count=0 ; Eva_count < ga_mon;Eva_count++){//遺伝子の数だけ繰り返したりする
                 num_gas[Eva_count]  = Eva(num_gas[Eva_count]);//評価関数　.sun_vに評価値を入れる。
@@ -137,21 +137,21 @@ int main(){
                  
                 arr = (int)((rand()/frand)*sums);//ルーレット
                 
-                for (size_t i = 0; i < ga_mon; i++)
-                {
-                    sum_vs+=num_gas[i].sum_v;//ルーレットに加算
+              
+                    sum_vs+=num_gas[ob].sum_v;//ルーレットに加算
                     if(sum_vs > arr){
-                            sub_ga = num_gas[i];//ルーレット選択用に代入
+                            sub_ga = num_gas[ob];//ルーレット選択用に代入
+                            sub_ga_nums =ob;
                             break;//ルーレット選択終了
                     }
-                }
+                
             }
            //todo オブジェクトの個数と遺伝子の数がごっちゃになっているので修正する
-            for (size_t i = 0; (objc_max%2 ==1 && i < objc_max-1)||(objc_max%2==0 &&i < objc_max-2) ; i++)//遺伝子交叉
+            for (size_t i = 0; (objc_max%2 == 1 && i < objc_max-1)||(objc_max%2==0 &&i < objc_max-2) ; i++)//遺伝子交叉
             {//個体個数が奇数子の時個体数-1で終了、偶数子の時個体数-2で終了    
                 arr = (int)((rand()/frand)*100);//交叉確率算出
                     
-                if(arr > late_a){
+                if(arr < late_a){
                     r1 = (int)((rand()/frand)*(objc_max)); //objc_maxは遺伝子長
                     r2 = r1 + (int)((rand()/frand)*(objc_max-r1));
                     
@@ -176,7 +176,11 @@ int main(){
             for (int obj = 0; obj < ga_mon; obj++)
             {
                 arr = (int)((rand()/frand)*100);
-                
+
+                if(num_gas[obj].sum_v==0){
+                    arr+=30;
+                }
+             
                 if (arr > random_late) 
                 {
                     r1  = (int)(rand()/frand)*(objc_max-1);
@@ -186,6 +190,7 @@ int main(){
             //エリート選択で使った遺伝子を元に戻す
             num_gas[one] = one_gas;
             num_gas[two] = two_gas;
+            num_gas[sub_ga_nums]=sub_ga;
         }
     
     for (size_t i = 0; i < ga_mon; i++)
@@ -210,7 +215,7 @@ int main(){
     fclose(fp);
     
 
-    printf("output result %d %d\n",num_gas[one].sum_v,num_gas[one].sum_c);        
+    printf("output result 総価値%d 重量%d\n",num_gas[one].sum_v,num_gas[one].sum_c);        
     printf("cnt %d \n",one);
     //ここにリザルトを出力する。
     return 0;
